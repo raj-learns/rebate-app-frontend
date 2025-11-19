@@ -35,12 +35,12 @@ export const Oauth = () => {
       const firebaseUser = result.user;
       const email = (firebaseUser.email || "").toLowerCase();
       if (!email) {
-        await signOut(auth).catch(() => {});
+        await signOut(auth).catch(() => { });
         alert("No email found on this Google account.");
         return;
       }
       if (!email.endsWith(allowedDomain)) {
-        await signOut(auth).catch(() => {});
+        await signOut(auth).catch(() => { });
         alert(`Please sign in with your college email (${allowedDomain})`);
         return;
       }
@@ -64,8 +64,15 @@ export const Oauth = () => {
 
       setUser(response.data.user);
       localStorage.setItem("user", JSON.stringify(response.data.user));
-      alert("Login Successful");
-      navigate("/");
+
+      if (response.data.exists) {
+        // Existing user → Main page
+        navigate("/");
+      } else {
+        // New user → Profile setup page
+        navigate("/create-profile", { state: response.data.user });
+      }
+
     } catch (error) {
       console.error("OAuth Error:", error);
       if (error?.code === "auth/popup-closed-by-user") return;
