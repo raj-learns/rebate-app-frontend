@@ -66,11 +66,13 @@ export const Oauth = () => {
       localStorage.setItem("user", JSON.stringify(response.data.user));
 
       if (response.data.exists) {
-        // Existing user → Main page
-        navigate("/");
+        if (response.data.profileComplete) {
+          navigate("/");        
+        } else {
+          navigate("/create-profile", { state: response.data.user }); 
+        }
       } else {
-        // New user → Profile setup page
-        navigate("/create-profile", { state: response.data.user });
+        navigate("/create-profile", { state: response.data.user });  
       }
 
     } catch (error) {
