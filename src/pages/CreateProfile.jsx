@@ -1,9 +1,47 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Box, Stack, Card, Typography, TextField, MenuItem, Button } from "@mui/material";
+import {
+  Box,
+  Stack,
+  Card,
+  Typography,
+  TextField,
+  MenuItem,
+  Button,
+  Divider,
+  Grid,
+} from "@mui/material";
 
 const BASE_URI = "http://localhost:3000";
+
+const textFieldStyles = {
+  fullWidth: true,
+  variant: "outlined",
+  InputLabelProps: {
+    sx: { color: "rgba(148, 163, 184, 0.9)", fontSize: 13 },
+  },
+  InputProps: {
+    sx: { color: "#e5e7eb", fontSize: 14 },
+  },
+  sx: {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2,
+      "& fieldset": {
+        borderColor: "rgba(51, 65, 85, 0.9)",
+      },
+      "&:hover fieldset": {
+        borderColor: "rgba(148, 163, 184, 1)",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#6366f1",
+      },
+    },
+    "& .MuiSvgIcon-root": {
+      color: "rgba(148, 163, 184, 0.9)",
+    },
+  },
+};
 
 function CreateProfile() {
   const { state } = useLocation();
@@ -49,211 +87,341 @@ function CreateProfile() {
 
   return (
     <Box
-      minHeight="100vh"
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      p={2}
+      sx={{
+        position: "fixed",          // cover whole viewport
+        inset: 0,                   // top:0, right:0, bottom:0, left:0
+        background:
+          "radial-gradient(circle at top, #0f172a 0, #020617 45%, #020617 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        px: { xs: 2, sm: 3, md: 8 },
+        py: { xs: 4, md: 6 },
+        boxSizing: "border-box",
+        overflowY: "auto",          // scroll only vertically if needed
+        overflowX: "hidden",        // no horizontal scroll
+      }}
     >
-      <Card
+      <Grid
+        container
+        spacing={{ xs: 4, md: 6 }}
+        alignItems="center"
         sx={{
-          width: "100%",
-          maxWidth: 500,
-          p: 4,
-          borderRadius: 3,
-          background: "rgba(255, 255, 255, 0.1)",
-          backdropFilter: "blur(8px)",
+          width: "100%",            // full width within viewport
+          maxWidth: 1200,           // but keep content readable
+          mx: "auto",
         }}
       >
-        {/* Title */}
-        {/* Title */}
-        <Typography
-          variant="h4"
-          fontWeight="bold"
-          color="white"
-          textAlign="center"
-          mb={5}
-        >
-          Complete Your Profile
-        </Typography>
-
-        {/* STACK AUTOMATICALLY SPACES EVERYTHING */}
-        <Stack spacing={4}>
-
-          {/* NAME */}
-          <TextField
-            label="Name"
-            value={user.name}
-            InputProps={{
-              readOnly: true,
-              sx: { color: "white" },
-            }}
-            InputLabelProps={{
-              sx: { color: "white" },
-            }}
+        {/* LEFT: WELCOME */}
+        <Grid item xs={12} md={6}>
+          <Box
             sx={{
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "& .MuiSvgIcon-root": { color: "white" }
-            }}
-          />
-
-          {/* EMAIL */}
-          <TextField
-            label="Email"
-            value={user.email}
-            InputProps={{
-              readOnly: true,
-              sx: { color: "white" },
-            }}
-            InputLabelProps={{
-              sx: { color: "white" },
-            }}
-            sx={{
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "& .MuiSvgIcon-root": { color: "white" }
-            }}
-          />
-
-          {/* ENTRY NO */}
-          <TextField
-            label="Entry Number"
-            value={user.entry_no}
-            InputProps={{
-              readOnly: true,
-              sx: { color: "white" },
-            }}
-            InputLabelProps={{
-              sx: { color: "white" },
-            }}
-            sx={{
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "& .MuiSvgIcon-root": { color: "white" }
-            }}
-          />
-
-          {/* COURSE */}
-          <TextField
-            select
-            label="Course"
-            value={course}
-            onChange={(e) => setCourse(e.target.value)}
-            InputLabelProps={{ sx: { color: "white" } }}
-            InputProps={{ sx: { color: "white" } }}
-            sx={{
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "& .MuiSvgIcon-root": { color: "white" }
+              textAlign: { xs: "center", md: "left" },
             }}
           >
-            {["BTech", "MTech", "MSc", "Other"].map((item) => (
-              <MenuItem key={item} value={item} sx={{ color: "#103d04ff" }}>
-                {item}
-              </MenuItem>
-            ))}
-          </TextField>
+            <Typography
+              variant="overline"
+              sx={{
+                letterSpacing: 1.6,
+                color: "rgba(148, 163, 184, 0.9)",
+                fontSize: 11,
+              }}
+            >
+              IIT ROPAR • CAMPUS PORTAL
+            </Typography>
 
-          {/* BATCH */}
-          <TextField
-            select
-            label="Batch"
-            value={batch}
-            onChange={(e) => setBatch(e.target.value)}
-            InputLabelProps={{ sx: { color: "white" } }}
-            InputProps={{ sx: { color: "white" } }}
+            <Typography
+              variant="h3"
+              sx={{
+                fontWeight: 800,
+                color: "#f9fafb",
+                mt: 1.5,
+                mb: 1,
+                lineHeight: 1.1,
+                fontSize: { xs: 28, md: 36 },
+              }}
+            >
+              Welcome, {user?.name?.split(" ")[0] || "Student"} 👋
+            </Typography>
+
+            <Typography
+              variant="body1"
+              sx={{
+                color: "rgba(148, 163, 184, 0.95)",
+                maxWidth: { xs: "100%", md: 460 },
+                mx: { xs: "auto", md: 0 },
+                mb: 3,
+              }}
+            >
+              Just one quick step before you’re in. Tell us about your course,
+              hostel and food preference so we can tailor your campus
+              experience.
+            </Typography>
+
+            <Stack
+              spacing={1.2}
+              sx={{
+                alignItems: "flex-start",
+                maxWidth: { xs: "100%", md: 360 },
+                mx: { xs: "auto", md: 0 },
+              }}
+            >
+              {[
+                "Faster mess & hostel-related updates",
+                "Personalized campus notifications",
+                "Better discovery of relevant events",
+              ].map((text) => (
+                <Stack
+                  key={text}
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                >
+                  <Box
+                    sx={{
+                      width: 18,
+                      height: 18,
+                      borderRadius: "4px",
+                      bgcolor: "#22c55e",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 12,
+                      color: "#022c22",
+                      fontWeight: 700,
+                    }}
+                  >
+                    ✓
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "rgba(203, 213, 225, 0.95)" }}
+                  >
+                    {text}
+                  </Typography>
+                </Stack>
+              ))}
+            </Stack>
+          </Box>
+        </Grid>
+
+        {/* RIGHT: FORM CARD */}
+        <Grid item xs={12} md={6}>
+          <Box
             sx={{
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "& .MuiSvgIcon-root": { color: "white" }
+              display: "flex",
+              justifyContent: { xs: "center", md: "flex-end" },
             }}
           >
-            {["2020", "2021", "2022", "2023", "2024", "2025"].map((b) => (
-              <MenuItem key={b} value={b} sx={{ color: "#103d04ff" }}>
-                {b}
-              </MenuItem>
-            ))}
-          </TextField>
+            <Card
+              sx={{
+                width: "100%",
+                maxWidth: 430,
+                p: { xs: 3, sm: 4 },
+                borderRadius: 3,
+                bgcolor: "rgba(15, 23, 42, 0.98)",
+                border: "1px solid rgba(51, 65, 85, 1)",
+                boxShadow: "0 20px 50px rgba(15,23,42,0.9)",
+              }}
+            >
+              {/* Small title on mobile */}
+              <Stack
+                spacing={0.5}
+                mb={2.5}
+                display={{ xs: "flex", md: "none" }}
+              >
+                <Typography
+                  variant="overline"
+                  sx={{
+                    letterSpacing: 1.4,
+                    color: "rgba(148, 163, 184, 0.9)",
+                    fontSize: 11,
+                  }}
+                >
+                  Profile setup
+                </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 700, color: "#f9fafb" }}
+                >
+                  Complete your profile
+                </Typography>
+              </Stack>
 
-          {/* HOSTEL */}
-          <TextField
-            select
-            label="Hostel"
-            value={hostel}
-            onChange={(e) => setHostel(e.target.value)}
-            InputLabelProps={{ sx: { color: "white" } }}
-            InputProps={{ sx: { color: "white" } }}
-            sx={{
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "& .MuiSvgIcon-root": { color: "white" }
-            }}
-          >
-            {["Chenab", "Beas", "Sutlej", "Ravi", "Brahmputra", "T6"].map((h) => (
-              <MenuItem key={h} value={h} sx={{ color: "#103d04ff" }}>
-                {h}
-              </MenuItem>
-            ))}
-          </TextField>
+              {/* Logged info */}
+              <Box
+                sx={{
+                  mb: 3,
+                  p: 1.5,
+                  borderRadius: 2,
+                  bgcolor: "rgba(15, 23, 42, 0.9)",
+                  border: "1px dashed rgba(55, 65, 81, 1)",
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{ color: "rgba(148, 163, 184, 0.9)" }}
+                >
+                  Logged in as
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "#e5e7eb", fontWeight: 500 }}
+                >
+                  {user.name}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "rgba(148, 163, 184, 0.9)" }}
+                >
+                  {user.email} • {user.entry_no}
+                </Typography>
+              </Box>
 
-          {/* MESS */}
-          <TextField
-            select
-            label="Mess"
-            value={mess}
-            onChange={(e) => setMess(e.target.value)}
-            InputLabelProps={{ sx: { color: "white" } }}
-            InputProps={{ sx: { color: "white" } }}
-            sx={{
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "& .MuiSvgIcon-root": { color: "white" }
-            }}
-          >
-            {["Anusha", "Konark", "Ideal"].map((m) => (
-              <MenuItem key={m} value={m} sx={{ color: "#103d04ff" }}>
-                {m}
-              </MenuItem>
-            ))}
-          </TextField>
+              <Divider
+                sx={{
+                  mb: 3,
+                  borderColor: "rgba(30, 41, 59, 1)",
+                }}
+              />
 
-          {/* FOOD */}
-          <TextField
-            select
-            label="Food Choice"
-            value={food}
-            onChange={(e) => setFood(e.target.value)}
-            InputLabelProps={{ sx: { color: "white" } }}
-            InputProps={{ sx: { color: "white" } }}
-            sx={{
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "white" },
-              "& .MuiSvgIcon-root": { color: "white" }
-            }}
-          >
-            <MenuItem value="veg" sx={{ color: "#103d04ff" }}>Veg</MenuItem>
-            <MenuItem value="nonveg" sx={{ color: "#103d04ff" }}>Non-Veg</MenuItem>
-          </TextField>
+              {/* FORM */}
+              <form onSubmit={handleSubmit}>
+                <Stack spacing={2.2}>
+                  <TextField
+                    select
+                    label="Course"
+                    value={course}
+                    onChange={(e) => setCourse(e.target.value)}
+                    {...textFieldStyles}
+                  >
+                    {["BTech", "MTech", "MSc", "Other"].map((item) => (
+                      <MenuItem
+                        key={item}
+                        value={item}
+                        sx={{ color: "#020617" }}
+                      >
+                        {item}
+                      </MenuItem>
+                    ))}
+                  </TextField>
 
-          <Button
-            variant="contained"
-            size="large"
-            onClick={handleSubmit}
-            sx={{ py: 1.5 }}
-          >
-            Submit Profile
-          </Button>
-        </Stack>
-      </Card>
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                    <TextField
+                      select
+                      label="Batch"
+                      value={batch}
+                      onChange={(e) => setBatch(e.target.value)}
+                      {...textFieldStyles}
+                    >
+                      {["2020", "2021", "2022", "2023", "2024", "2025"].map(
+                        (b) => (
+                          <MenuItem
+                            key={b}
+                            value={b}
+                            sx={{ color: "#020617" }}
+                          >
+                            {b}
+                          </MenuItem>
+                        )
+                      )}
+                    </TextField>
+
+                    <TextField
+                      select
+                      label="Hostel"
+                      value={hostel}
+                      onChange={(e) => setHostel(e.target.value)}
+                      {...textFieldStyles}
+                    >
+                      {["Chenab", "Beas", "Sutlej", "Ravi", "Brahmputra", "T6"]
+                        .map((h) => (
+                          <MenuItem
+                            key={h}
+                            value={h}
+                            sx={{ color: "#020617" }}
+                          >
+                            {h}
+                          </MenuItem>
+                        ))}
+                    </TextField>
+                  </Stack>
+
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                    <TextField
+                      select
+                      label="Mess"
+                      value={mess}
+                      onChange={(e) => setMess(e.target.value)}
+                      {...textFieldStyles}
+                    >
+                      {["Anusha", "Konark", "Ideal"].map((m) => (
+                        <MenuItem
+                          key={m}
+                          value={m}
+                          sx={{ color: "#020617" }}
+                        >
+                          {m}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+
+                    <TextField
+                      select
+                      label="Food Choice"
+                      value={food}
+                      onChange={(e) => setFood(e.target.value)}
+                      {...textFieldStyles}
+                    >
+                      <MenuItem value="veg" sx={{ color: "#020617" }}>
+                        Veg
+                      </MenuItem>
+                      <MenuItem value="nonveg" sx={{ color: "#020617" }}>
+                        Non-Veg
+                      </MenuItem>
+                    </TextField>
+                  </Stack>
+
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    size="large"
+                    sx={{
+                      mt: 1,
+                      py: 1.2,
+                      borderRadius: 999,
+                      fontWeight: 600,
+                      textTransform: "none",
+                      fontSize: 15,
+                      width: "100%",
+                      backgroundImage:
+                        "linear-gradient(135deg, #4f46e5 0%, #22c55e 50%, #0ea5e9 100%)",
+                      boxShadow: "0 15px 40px rgba(15,23,42,0.7)",
+                      "&:hover": {
+                        filter: "brightness(1.05)",
+                        boxShadow: "0 18px 50px rgba(15,23,42,0.9)",
+                      },
+                    }}
+                  >
+                    Save & Continue
+                  </Button>
+
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      textAlign: "center",
+                      color: "rgba(148, 163, 184, 0.9)",
+                    }}
+                  >
+                    You can update these details later from your profile
+                    settings.
+                  </Typography>
+                </Stack>
+              </form>
+            </Card>
+          </Box>
+        </Grid>
+      </Grid>
     </Box>
   );
 }
