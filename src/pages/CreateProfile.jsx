@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
@@ -11,6 +11,7 @@ import {
   Button,
   Divider,
   Grid,
+  Avatar,
 } from "@mui/material";
 
 const BASE_URI = "http://localhost:3000";
@@ -55,6 +56,32 @@ function CreateProfile() {
   const [mess, setMess] = useState("");
   const [food, setFood] = useState("");
 
+  // NEW: profile image state
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const [profileImagePreview, setProfileImagePreview] = useState(null);
+
+  // cleanup object URL when file changes
+  useEffect(() => {
+    if (!profileImageFile) {
+      setProfileImagePreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(profileImageFile);
+    setProfileImagePreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [profileImageFile]);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // optional: basic validation
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image file");
+      return;
+    }
+    setProfileImageFile(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -64,13 +91,24 @@ function CreateProfile() {
     }
 
     try {
-      const res = await axios.post(`${BASE_URI}/update-profile`, {
-        googleId: user.google_id,
-        course,
-        batch,
-        hostel,
-        mess,
-        food_choice: food,
+      // ⬇️ send multipart/form-data so backend can upload to Cloudinary
+      const formData = new FormData();
+      formData.append("googleId", user.google_id);
+      formData.append("course", course);
+      formData.append("batch", batch);
+      formData.append("hostel", hostel);
+      formData.append("mess", mess);
+      formData.append("food_choice", food);
+
+      // avatar field name — backend will read `req.file` or `req.files.avatar`
+      if (profileImageFile) {
+        formData.append("avatar", profileImageFile);
+      }
+
+      const res = await axios.post(`${BASE_URI}/update-profile`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       if (res.data.success) {
@@ -88,8 +126,8 @@ function CreateProfile() {
   return (
     <Box
       sx={{
-        position: "fixed",          // cover whole viewport
-        inset: 0,                   // top:0, right:0, bottom:0, left:0
+        position: "fixed",
+        inset: 0,
         background:
           "radial-gradient(circle at top, #0f172a 0, #020617 45%, #020617 100%)",
         display: "flex",
@@ -98,8 +136,8 @@ function CreateProfile() {
         px: { xs: 2, sm: 3, md: 8 },
         py: { xs: 4, md: 6 },
         boxSizing: "border-box",
-        overflowY: "auto",          // scroll only vertically if needed
-        overflowX: "hidden",        // no horizontal scroll
+        overflowY: "auto",
+        overflowX: "hidden",
       }}
     >
       <Grid
@@ -107,8 +145,8 @@ function CreateProfile() {
         spacing={{ xs: 4, md: 6 }}
         alignItems="center"
         sx={{
-          width: "100%",            // full width within viewport
-          maxWidth: 1200,           // but keep content readable
+          width: "100%",
+          maxWidth: 1200,
           mx: "auto",
         }}
       >
@@ -246,6 +284,70 @@ function CreateProfile() {
                 >
                   Complete your profile
                 </Typography>
+              </Stack>
+
+              {/* Profile image upload */}
+              <Stack
+                direction="row"
+                spacing={2}
+                alignItems="center"
+                mb={3}
+                sx={{ justifyContent: { xs: "center", md: "flex-start" } }}
+              >
+                <Avatar
+                  src={profileImagePreview || undefined}
+                  alt={user.name}
+                  sx={{
+                    width: 64,
+                    height: 64,
+                    bgcolor: "#1d4ed8",
+                    fontWeight: 600,
+                    fontSize: 24,
+                  }}
+                >
+                  {!profileImagePreview &&
+                    (user?.name?.[0]?.toUpperCase() || "U")}
+                </Avatar>
+                <Box>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ color: "#e5e7eb", mb: 0.5 }}
+                  >
+                    Profile photo
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "rgba(148, 163, 184, 0.9)" }}
+                  >
+                    JPG, PNG under 2MB is recommended.
+                  </Typography>
+                  <Box mt={1}>
+                    <Button
+                      variant="outlined"
+                      component="label"
+                      size="small"
+                      sx={{
+                        textTransform: "none",
+                        borderRadius: 999,
+                        fontSize: 13,
+                        borderColor: "rgba(75, 85, 99, 1)",
+                        color: "#e5e7eb",
+                        "&:hover": {
+                          borderColor: "#6366f1",
+                          backgroundColor: "rgba(55, 65, 81, 0.5)",
+                        },
+                      }}
+                    >
+                      Upload image
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={handleImageChange}
+                      />
+                    </Button>
+                  </Box>
+                </Box>
               </Stack>
 
               {/* Logged info */}

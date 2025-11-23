@@ -64,6 +64,8 @@ export const Oauth = () => {
 
       setUser(response.data.user);
       localStorage.setItem("user", JSON.stringify(response.data.user));
+// after successful /google-login response
+localStorage.setItem("googleId", response.data.user.google_id);
 
       if (response.data.exists) {
         if (response.data.profileComplete) {
