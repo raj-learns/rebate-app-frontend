@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import messMenu from "../assets/messMenu";
+import DEFAULT_IMAGE from "../assets/default.jpg";
 import {
   AppBar,
   Toolbar,
@@ -16,9 +18,21 @@ import {
   Button,
   Grid,
   CircularProgress,
+  Collapse,
+  List,
+  ListItem,
+  ListItemText
 } from "@mui/material";
 
 const BASE_URI = "http://localhost:3000";
+
+// --- placeholder image (uploaded file path from your session) ---
+// Developer note: I used the uploaded file path you provided. You'll transform it to a URL when serving.
+const IMAGE_PLACEHOLDER = "/mnt/data/8f8f52b6-70af-4ed0-8b9e-9fe56bb3e2e3.png";
+
+const todayName = new Date().toLocaleDateString("en-US", { weekday: "long" });
+const todayMenu = messMenu[todayName];
+
 
 export function HomePage() {
   const { state } = useLocation();
@@ -29,9 +43,18 @@ export function HomePage() {
   const [user, setUser] = useState(initialUser);
   const [loading, setLoading] = useState(!initialUser);
   const [error, setError] = useState(null);
+  const [openMeal, setOpenMeal] = useState(null);
+
 
   const [anchorEl, setAnchorEl] = useState(null);
   const menuOpen = Boolean(anchorEl);
+
+  const moreItems = {
+    breakfast: todayMenu.breakfast.slice(1),
+    lunch: todayMenu.lunch.slice(1),
+    dinner: todayMenu.dinner.slice(1),
+  };
+
 
   // ------- fetch user from API -------
   useEffect(() => {
@@ -146,6 +169,34 @@ export function HomePage() {
   const isVerified = status === "verified";
   const firstName = user?.name?.split(" ")[0] || "Student";
 
+  // greeting includes today's weekday
+  const weekday = new Date().toLocaleDateString(undefined, { weekday: "long" });
+
+  const foodCards = [
+    {
+      key: "breakfast",
+      label: "Breakfast",
+      main: todayMenu.breakfast[0],  // first item
+    },
+    {
+      key: "lunch",
+      label: "Lunch",
+      main: todayMenu.lunch[0],
+    },
+    {
+      key: "dinner",
+      label: "Dinner",
+      main: todayMenu.dinner[0],
+    }
+  ];
+
+
+  // today's extra items (hardcoded as requested)
+  const extraItems = {
+    lunch: { title: "Curd", desc: "Fresh curd (200 ml)" },
+    dinner: { title: "Chicken Biryani", desc: "Spicy biryani (single plate)" },
+  };
+
   return (
     <Box
       sx={{
@@ -182,7 +233,7 @@ export function HomePage() {
             variant="h6"
             sx={{ flexGrow: 1, fontWeight: 700, color: "#e5e7eb" }}
           >
-
+            MessMate
           </Typography>
 
           <IconButton
@@ -202,8 +253,7 @@ export function HomePage() {
                 fontWeight: 600,
               }}
             >
-              {!user.avatar_url &&
-                (user?.name?.[0]?.toUpperCase() || "U")}
+              {!user.avatar_url && (user?.name?.[0]?.toUpperCase() || "U")}
             </Avatar>
           </IconButton>
 
@@ -231,23 +281,23 @@ export function HomePage() {
         sx={{
           flex: 1,
           display: "flex",
-          alignItems: "center",
+          alignItems: "flex-start",
           justifyContent: "center",
           px: { xs: 2, sm: 3, md: 6 },
-          py: { xs: 4, md: 6 },
+          py: { xs: 3, md: 6 },
         }}
       >
         <Grid
           container
-          spacing={{ xs: 4, md: 5 }}
-          alignItems="center"
+          spacing={{ xs: 3, md: 5 }}
+          alignItems="flex-start"
           sx={{
             maxWidth: 1200,
             width: "100%",
             mx: "auto",
           }}
         >
-          {/* LEFT: welcome text */}
+          {/* LEFT: greeting and food menu */}
           <Grid item xs={12} md={6}>
             <Box sx={{ textAlign: { xs: "center", md: "left" } }}>
               <Typography
@@ -258,101 +308,267 @@ export function HomePage() {
                   fontSize: 11,
                 }}
               >
-                IIT ROPAR • CAMPUS PORTAL
+                IIT ROPAR • MESS MENU
               </Typography>
 
               <Typography
-                variant="h3"
+                variant="h4"
                 sx={{
                   fontWeight: 800,
                   color: "#f9fafb",
-                  mt: 1.5,
-                  mb: 1,
-                  lineHeight: 1.1,
-                  fontSize: { xs: 28, md: 34 },
+                  mt: 1,
+                  mb: 1.2,
+                  lineHeight: 1.05,
+                  fontSize: { xs: 22, md: 30 },
                 }}
               >
-                Hi, {firstName} 👋
+                Hi, {firstName}. Happy {weekday}!
               </Typography>
 
               <Typography
-                variant="body1"
+                variant="body2"
                 sx={{
                   color: "rgba(148, 163, 184, 0.95)",
-                  maxWidth: { xs: "100%", md: 440 },
+                  maxWidth: { xs: "100%", md: 520 },
                   mx: { xs: "auto", md: 0 },
-                  mb: 3,
+                  mb: 2,
                 }}
               >
-                This is your home base for mess updates, hostel information and
-                campus notifications. We’ll unlock all features once your
-                profile is verified.
+                Food menu for today:
               </Typography>
 
-              <Stack
-                spacing={1.2}
+              {/* --- HORIZONTAL FOOD CARDS (always horizontal) --- */}
+              <Box
                 sx={{
-                  alignItems: "flex-start",
-                  maxWidth: { xs: "100%", md: 360 },
+                  display: "flex",
+                  gap: 2,
+                  alignItems: "stretch",
+                  overflowX: { xs: "auto", md: "visible" },
+                  py: { xs: 1, md: 0 },
+                  px: { xs: 1, md: 0 },
+                  // hide horizontal scrollbar but keep scroll functionality on mobile
+                  "&::-webkit-scrollbar": { height: 6 },
+                }}
+              >
+                {foodCards.map((card) => (
+                  <Card
+                    key={card.key}
+                    sx={{
+                      minWidth: { xs: 160, sm: 180, md: 200 },
+                      maxWidth: { xs: 180, sm: 200, md: 240 },
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: "rgba(10,14,23,0.75)",
+                      border: "1px solid rgba(41, 50, 70, 0.9)",
+                      flex: "0 0 auto",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "rgba(148,163,184,0.8)", mb: 0.7 }}
+                    >
+                      {card.label}
+                    </Typography>
+
+                    <Box
+                      component="img"
+                      src={DEFAULT_IMAGE}
+                      alt={`${card.label} image`}
+                      sx={{
+                        width: { xs: 72, sm: 84, md: 96 },
+                        height: { xs: 72, sm: 84, md: 96 },
+                        objectFit: "cover",
+                        borderRadius: 1,
+                        mb: 1,
+                        border: "1px solid rgba(55,65,81,0.6)",
+                      }}
+                    />
+
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "#e5e7eb",
+                        fontWeight: 600,
+                        textAlign: "center",
+                      }}
+                    >
+                      {card.main}
+                    </Typography>
+
+                    <Button
+                      size="small"
+                      sx={{
+                        mt: 1,
+                        textTransform: "none",
+                        color: "rgba(130,140,255,0.95)",
+                      }}
+                      onClick={() =>
+                        setOpenMeal(openMeal === card.key ? null : card.key)
+                      }
+                    >
+                      {openMeal === card.key ? "See less" : "See more"}
+                    </Button>
+
+                    <Collapse in={openMeal === card.key}>
+                      <List dense>
+                        {moreItems[card.key].map((item, idx) => (
+                          <ListItem key={idx} sx={{ py: 0 }}>
+                            <ListItemText
+                              primary={item}
+                              primaryTypographyProps={{
+                                sx: { color: "rgba(203,213,225,0.9)", fontSize: 13 },
+                              }}
+                            />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Collapse>
+
+                  </Card>
+                ))}
+              </Box>
+
+              {/* --- Today's Extra Items (separate section) --- */}
+              <Box
+                sx={{
+                  mt: 3,
+                  p: 2,
+                  borderRadius: 2,
+                  bgcolor: "rgba(15,23,42,0.85)",
+                  border: "1px solid rgba(51,65,85,0.6)",
+                  maxWidth: 720,
                   mx: { xs: "auto", md: 0 },
                 }}
               >
-                {[
-                  "Keep your mess & hostel preferences updated.",
-                  "Get notifications tailored to your batch and course.",
-                  "Easily manage your profile anytime.",
-                ].map((text) => (
+                <Typography
+                  variant="subtitle2"
+                  sx={{ color: "#e5e7eb", fontWeight: 700, mb: 1 }}
+                >
+                  Today's Extra Items
+                </Typography>
+
+                <Stack spacing={1.4}>
+                  {/* Lunch extra (hardcoded Curd) */}
                   <Stack
-                    key={text}
                     direction="row"
-                    spacing={1}
+                    spacing={2}
                     alignItems="center"
+                    sx={{
+                      bgcolor: "rgba(8,10,18,0.6)",
+                      p: 1,
+                      borderRadius: 1.5,
+                      border: "1px solid rgba(41,50,70,0.6)",
+                    }}
                   >
                     <Box
+                      component="img"
+                      src={DEFAULT_IMAGE}
+                      alt="curd"
                       sx={{
-                        width: 18,
-                        height: 18,
-                        borderRadius: "4px",
-                        bgcolor: "#22c55e",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: 12,
-                        color: "#022c22",
-                        fontWeight: 700,
+                        width: 64,
+                        height: 64,
+                        objectFit: "cover",
+                        borderRadius: 1,
                       }}
-                    >
-                      ✓
+                    />
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="body2" sx={{ color: "#e5e7eb", fontWeight: 600 }}>
+                        Lunch — {extraItems.lunch.title}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: "rgba(148,163,184,0.9)" }}>
+                        {extraItems.lunch.desc}
+                      </Typography>
                     </Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "rgba(203, 213, 225, 0.95)" }}
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        textTransform: "none",
+                        borderRadius: 999,
+                        borderColor: "rgba(75,85,99,0.8)",
+                        color: "#e5e7eb",
+                      }}
+                      onClick={() => alert("Extra item details (TODO)")}
                     >
-                      {text}
-                    </Typography>
+                      Details
+                    </Button>
                   </Stack>
-                ))}
-              </Stack>
+
+                  {/* Dinner extra (hardcoded Chicken Biryani) */}
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    alignItems="center"
+                    sx={{
+                      bgcolor: "rgba(8,10,18,0.6)",
+                      p: 1,
+                      borderRadius: 1.5,
+                      border: "1px solid rgba(41,50,70,0.6)",
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      src={DEFAULT_IMAGE}
+                      alt="biryani"
+                      sx={{
+                        width: 64,
+                        height: 64,
+                        objectFit: "cover",
+                        borderRadius: 1,
+                      }}
+                    />
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="body2" sx={{ color: "#e5e7eb", fontWeight: 600 }}>
+                        Dinner — {extraItems.dinner.title}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: "rgba(148,163,184,0.9)" }}>
+                        {extraItems.dinner.desc}
+                      </Typography>
+                    </Box>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        textTransform: "none",
+                        borderRadius: 999,
+                        borderColor: "rgba(75,85,99,0.8)",
+                        color: "#e5e7eb",
+                      }}
+                      onClick={() => alert("Extra item details (TODO)")}
+                    >
+                      Details
+                    </Button>
+                  </Stack>
+                </Stack>
+              </Box>
             </Box>
           </Grid>
 
-          {/* RIGHT: compact status card */}
-          <Grid item xs={12} md={6}>
-            <Box
+          {/* RIGHT: compact status / actions card */}
+          {!isVerified && (
+            <Grid
+              item
+              xs={12}
+              md={6}
               sx={{
                 display: "flex",
                 justifyContent: { xs: "center", md: "flex-end" },
+                width: "100%",
               }}
             >
               <Card
                 sx={{
-                  width: "100%",
-                  maxWidth: 420,
-                  p: { xs: 3, sm: 3.5 },
+                  width: { xs: "100%", sm: "92%", md: "100%" },
+                  maxWidth: { xs: "100%", sm: 480, md: 420 },
+                  p: { xs: 2.5, sm: 3.5 },
                   borderRadius: 3,
                   bgcolor: "rgba(15, 23, 42, 0.98)",
                   border: "1px solid rgba(51, 65, 85, 1)",
                   boxShadow: "0 20px 50px rgba(15,23,42,0.9)",
+                  mx: "auto",
                 }}
               >
                 <Stack spacing={2}>
@@ -364,16 +580,10 @@ export function HomePage() {
                   >
                     <Stack direction="row" spacing={1} alignItems="center">
                       <Chip
-                        label={
-                          isVerified
-                            ? "Profile Verified"
-                            : "Pending Verification"
-                        }
+                        label={isVerified ? "Profile Verified" : "Pending Verification"}
                         size="small"
                         sx={{
-                          bgcolor: isVerified
-                            ? "rgba(22, 163, 74, 0.15)"
-                            : "rgba(234, 179, 8, 0.12)",
+                          bgcolor: isVerified ? "rgba(22, 163, 74, 0.15)" : "rgba(234, 179, 8, 0.12)",
                           color: isVerified ? "#4ade80" : "#facc15",
                           borderRadius: "999px",
                           border: "1px solid rgba(148,163,184,0.25)",
@@ -381,10 +591,7 @@ export function HomePage() {
                         }}
                       />
                       {user?.entry_no && (
-                        <Typography
-                          variant="caption"
-                          sx={{ color: "rgba(148, 163, 184, 0.9)" }}
-                        >
+                        <Typography variant="caption" sx={{ color: "rgba(148, 163, 184, 0.9)" }}>
                           {user.entry_no}
                         </Typography>
                       )}
@@ -401,104 +608,110 @@ export function HomePage() {
                         fontWeight: 700,
                       }}
                     >
-                      {!user?.avatar_url &&
-                        (user?.name?.[0]?.toUpperCase() || "U")}
+                      {!user?.avatar_url && (user?.name?.[0]?.toUpperCase() || "U")}
                     </Avatar>
                   </Stack>
 
-                  <Typography
-                    variant="subtitle1"
-                    sx={{ color: "#e5e7eb", fontWeight: 600 }}
-                  >
-                    {isVerified
-                      ? "You're all set!"
-                      : "Your profile is under review"}
+                  <Typography variant="subtitle1" sx={{ color: "#e5e7eb", fontWeight: 600 }}>
+                    {isVerified ? "You're all set!" : "Your profile is under review"}
                   </Typography>
 
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "rgba(148, 163, 184, 0.95)" }}
-                  >
+                  <Typography variant="body2" sx={{ color: "rgba(148, 163, 184, 0.95)" }}>
                     {isVerified ? (
                       <>
-                        Your profile has been <strong>verified</strong>. You
-                        now receive full access and personalized campus updates
-                        based on your preferences.
+                        Your profile has been <strong>verified</strong>. You now receive full access.
                       </>
                     ) : (
                       <>
-                        Your profile is currently{" "}
-                        <strong>under verification</strong>. Once an admin
-                        approves it, this badge will turn green and you’ll get
-                        full access.
+                        You can use <strong>rebate features</strong> only after Verification. Please wait for admin approval.
                       </>
                     )}
                   </Typography>
 
-                  <Stack spacing={1.2}>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: "rgba(148, 163, 184, 0.9)" }}
-                    >
+                  <Stack spacing={1}>
+                    <Typography variant="caption" sx={{ color: "rgba(148, 163, 184, 0.9)" }}>
                       {user?.email}
                     </Typography>
-                    {user?.course && (
-                      <Typography
-                        variant="caption"
-                        sx={{ color: "rgba(148, 163, 184, 0.9)" }}
-                      >
-                        {user.course} • {user.batch}
-                      </Typography>
-                    )}
-                    {user?.hostel && (
-                      <Typography
-                        variant="caption"
-                        sx={{ color: "rgba(148, 163, 184, 0.9)" }}
-                      >
-                        {user.hostel} hostel • {user.mess} mess ·{" "}
-                        {user.food_choice === "veg" ? "Veg" : "Non-veg"}
-                      </Typography>
-                    )}
-                  </Stack>
 
-                  <Stack direction="row" spacing={1.5} mt={1}>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={handleApplyRebate}
-                      sx={{
-                        textTransform: "none",
-                        borderRadius: 999,
-                        borderColor: "rgba(75, 85, 99, 1)",
-                        color: "#e5e7eb",
-                        "&:hover": {
-                          borderColor: "#6366f1",
-                          backgroundColor: "rgba(55, 65, 81, 0.5)",
-                        },
-                      }}
-                    >
-                      Apply for rebate
-                    </Button>
-                    {!isVerified && (
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: "rgba(148, 163, 184, 0.9)",
-                          alignSelf: "center",
-                        }}
-                      >
-                        Verification usually takes a short time.
+                    {user?.hostel && (
+                      <Typography variant="caption" sx={{ color: "rgba(148, 163, 184, 0.9)" }}>
+                        {user.hostel} hostel • {user.mess} mess · {user.food_choice === "veg" ? "Veg" : "Non-veg"}
                       </Typography>
                     )}
                   </Stack>
                 </Stack>
               </Card>
-            </Box>
-          </Grid>
+            </Grid>
+          )}
+          {isVerified && (
+            <Grid
+              item
+              xs={12}
+              md={6}
+              sx={{
+                display: "flex",
+                justifyContent: { xs: "center", md: "flex-end" },
+                width: "100%",
+              }}
+            >
+              <Card
+                sx={{
+                  width: { xs: "100%", sm: "92%", md: "100%" },
+                  maxWidth: { xs: "100%", sm: 480, md: 420 },
+                  p: { xs: 2.5, sm: 3.5 },
+                  borderRadius: 3,
+                  bgcolor: "rgba(15, 23, 42, 0.98)",
+                  border: "1px solid rgba(51, 65, 85, 1)",
+                  boxShadow: "0 20px 50px rgba(15,23,42,0.9)",
+                }}
+              >
+                <Stack spacing={2}>
+
+                  {/* Rebate history button */}
+                  <Button
+                    variant="contained"
+                    sx={{
+                      py: 1,
+                      borderRadius: 999,
+                      backgroundImage:
+                        "linear-gradient(135deg, #4f46e5 0%, #22c55e 50%, #0ea5e9 100%)",
+                      fontWeight: 600,
+                      textTransform: "none",
+                    }}
+                  >
+                    Click to see your rebate history
+                  </Button>
+
+                  {/* Rebates left */}
+                  <Typography
+                    variant="body2"
+                    sx={{ color: "rgba(148,163,184,0.9)" }}
+                  >
+                    Total rebates left: <strong>— TODO / 20</strong>
+                  </Typography>
+
+                  {/* Apply rebate */}
+                  <Button
+                    variant="outlined"
+                    onClick={handleApplyRebate}
+                    sx={{
+                      textTransform: "none",
+                      borderRadius: 999,
+                      borderColor: "rgba(75, 85, 99, 1)",
+                      color: "#e5e7eb",
+                    }}
+                  >
+                    Apply for rebate
+                  </Button>
+
+                </Stack>
+              </Card>
+            </Grid>
+          )}
         </Grid>
       </Box>
     </Box>
   );
 }
 
-//export default HomePage;
+export default HomePage;
