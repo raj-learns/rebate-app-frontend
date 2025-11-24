@@ -1,12 +1,11 @@
 import React from 'react'
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import { LoginPage } from './pages/login'
 import './App.css'
 import CreateProfile from './pages/CreateProfile';
 import { HomePage } from './pages/home';
+import ApplyRebate from './pages/ApplyRebate';
 function App() {
   const [count, setCount] = useState(0)
 
@@ -23,6 +22,7 @@ function App() {
           <Route path='/login' element={<LoginPage></LoginPage>}></Route>
           <Route path='/' element={<HomePage />}></Route>
           <Route path='/create-profile' element={<CreateProfile />}></Route>
+          <Route path='/rebate-application' element={<ApplyRebate />}></Route>
         </Routes>
       </BrowserRouter>
     </>

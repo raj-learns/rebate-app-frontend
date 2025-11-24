@@ -79,6 +79,21 @@ export function HomePage() {
     if (user) navigate("/profile", { state: { user } });
   };
 
+  const handleApplyRebate = () => {
+    handleMenuClose();
+
+    if (user)
+      navigate("/rebate-application", {
+        state: {
+          name: user.name,
+          google_id: user.google_id,
+          entry_no: user.entry_no,
+          hostel: user.hostel,
+          mess: user.mess,
+        },
+      });
+  };
+
   const handleLogout = () => {
     handleMenuClose();
     localStorage.removeItem("googleId");
@@ -167,7 +182,7 @@ export function HomePage() {
             variant="h6"
             sx={{ flexGrow: 1, fontWeight: 700, color: "#e5e7eb" }}
           >
-            
+
           </Typography>
 
           <IconButton
@@ -450,7 +465,7 @@ export function HomePage() {
                     <Button
                       variant="outlined"
                       size="small"
-                      onClick={handleViewProfile}
+                      onClick={handleApplyRebate}
                       sx={{
                         textTransform: "none",
                         borderRadius: 999,
@@ -462,7 +477,7 @@ export function HomePage() {
                         },
                       }}
                     >
-                      View profile
+                      Apply for rebate
                     </Button>
                     {!isVerified && (
                       <Typography
