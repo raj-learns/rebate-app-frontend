@@ -82,20 +82,26 @@ export default function ApplyRebate() {
     return (
         <Box
             sx={{
-                position: "fixed",
-                inset: 0,
+                minHeight: "100vh",
+                width: "100%",
                 background:
                     "radial-gradient(circle at top, #0f172a 0, #020617 45%, #020617 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
                 px: { xs: 2, sm: 3, md: 8 },
+                py: { xs: 3, md: 6 },
                 overflowY: "auto",
+                display: "flex",
+                justifyContent: "center",
             }}
         >
-            <Grid container spacing={5} alignItems="center" maxWidth={1100}>
+
+            <Grid
+                container
+                spacing={{ xs: 3, md: 5 }}
+                alignItems="flex-start"
+                maxWidth={1100}
+            >
                 {/* LEFT SECTION */}
-                <Grid item xs={12} md={6}>
+                <Grid item xs={12} md={6} sx={{ textAlign: { xs: "center", md: "left" } }}>
                     <Typography
                         variant="overline"
                         sx={{ color: "rgba(148,163,184,0.8)", letterSpacing: 1 }}
@@ -111,6 +117,7 @@ export default function ApplyRebate() {
                             mt: 1,
                             mb: 2,
                             lineHeight: 1.1,
+                            fontSize: { xs: 26, sm: 30, md: 36 },
                         }}
                     >
                         Apply for Mess Rebate 🍽️
@@ -139,42 +146,54 @@ export default function ApplyRebate() {
                         >
                             Note:
                         </Typography>
-
-                        <Stack spacing={1.2}>
-                            {[
-                                "You won't be allowed to have food during the mess rebate period.",
-                                "You can take up to 20 rebates as per the institute rebate policy.",
-                                "Your rebate status will remain pending until approved by both the mess manager and the hostel caretaker.",
-                                "Your profile photo will be visible on the admin portal during your leave, and you won't be allowed to enter the mess."
-                            ].map((text, idx) => (
-                                <Stack key={idx} direction="row" spacing={1} alignItems="flex-start">
-                                    <Box
-                                        sx={{
-                                            width: 6,
-                                            height: 6,
-                                            mt: "6px",
-                                            borderRadius: "50%",
-                                            bgcolor: "#22c55e",
-                                            flexShrink: 0,
-                                        }}
-                                    />
-                                    <Typography variant="body2" sx={{ color: "rgba(203,213,225,0.9)" }}>
-                                        {text}
-                                    </Typography>
-                                </Stack>
-                            ))}
-                        </Stack>
+                        <Box sx={{ mt: { xs: 2, md: 1 }, mb: { xs: 3, md: 2 } }}>
+                            <Stack spacing={1.2}>
+                                {[
+                                    "You won't be allowed to have food during the mess rebate period.",
+                                    "You can take up to 20 rebates as per the institute rebate policy.",
+                                    "Your rebate status will remain pending until approved by both the mess manager and the hostel caretaker.",
+                                    "Your profile photo will be visible on the admin portal during your leave, and you won't be allowed to enter the mess."
+                                ].map((text, idx) => (
+                                    <Stack key={idx} direction="row" spacing={1} alignItems="flex-start">
+                                        <Box
+                                            sx={{
+                                                width: 6,
+                                                height: 6,
+                                                mt: "6px",
+                                                borderRadius: "50%",
+                                                bgcolor: "#22c55e",
+                                                flexShrink: 0,
+                                            }}
+                                        />
+                                        <Typography variant="body2" sx={{ color: "rgba(203,213,225,0.9)" }}>
+                                            {text}
+                                        </Typography>
+                                    </Stack>
+                                ))}
+                            </Stack>
+                        </Box>
                     </Box>
 
                 </Grid>
 
                 {/* RIGHT SECTION */}
-                <Grid item xs={12} md={6}>
+                <Grid
+                    item
+                    xs={12}
+                    md={6}
+                    sx={{
+                        display: "flex",
+                        justifyContent: { xs: "center", md: "flex-end" },
+                        width: "100%",
+                    }}
+                >
                     <Card
                         sx={{
                             width: "100%",
-                            maxWidth: 600,
-                            p: 4,
+                            width: "100%",
+                            maxWidth: { xs: "100%", sm: 420, md: 600 },
+                            p: { xs: 2.5, sm: 3.5, md: 4 },
+                            mx: "auto",
                             borderRadius: 3,
                             bgcolor: "rgba(15,23,42,0.98)",
                             border: "1px solid rgba(51,65,85,1)",
@@ -227,7 +246,7 @@ export default function ApplyRebate() {
 
                         {/* FORM */}
                         <form onSubmit={submitRebate}>
-                            <Stack spacing={2.2}>
+                            <Stack spacing={{ xs: 1.8, sm: 2.2 }}>
                                 <TextField
                                     label="Reason for Rebate"
                                     value={reason}
