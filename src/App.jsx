@@ -6,6 +6,7 @@ import './App.css'
 import CreateProfile from './pages/CreateProfile';
 import { HomePage } from './pages/home';
 import ApplyRebate from './pages/ApplyRebate';
+import RebateHistory from './pages/RebateHistory';
 function App() {
   const [count, setCount] = useState(0)
 
@@ -23,6 +24,7 @@ function App() {
           <Route path='/' element={<HomePage />}></Route>
           <Route path='/create-profile' element={<CreateProfile />}></Route>
           <Route path='/rebate-application' element={<ApplyRebate />}></Route>
+          <Route path='/my-rebates' element={<RebateHistory />}></Route>
         </Routes>
       </BrowserRouter>
     </>
