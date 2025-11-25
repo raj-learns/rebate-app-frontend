@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import messMenu from "../assets/messMenu";
+import menuImages from "../assets/messMenu/index";
 import DEFAULT_IMAGE from "../assets/default.jpg";
 import {
   AppBar,
@@ -31,6 +32,7 @@ const BASE_URI = "http://localhost:3000";
 const IMAGE_PLACEHOLDER = "/mnt/data/8f8f52b6-70af-4ed0-8b9e-9fe56bb3e2e3.png";
 
 const todayName = new Date().toLocaleDateString("en-US", { weekday: "long" });
+const today = todayName.toLowerCase();
 const todayMenu = messMenu[todayName];
 
 
@@ -44,7 +46,7 @@ export function HomePage() {
   const [loading, setLoading] = useState(!initialUser);
   const [error, setError] = useState(null);
   const [openMeal, setOpenMeal] = useState(null);
-
+  const [rebatesUsed, setRebatesUsed] = useState(0);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const menuOpen = Boolean(anchorEl);
@@ -54,8 +56,6 @@ export function HomePage() {
     lunch: todayMenu.lunch.slice(1),
     dinner: todayMenu.dinner.slice(1),
   };
-
-
   // ------- fetch user from API -------
   useEffect(() => {
     if (initialUser?.google_id) {
@@ -92,7 +92,23 @@ export function HomePage() {
     };
 
     fetchUser();
+
+    // FETCH TOTAL REBATES USED
+    const fetchRebatesTotal = async () => {
+      try {
+        const res = await axios.get(
+          `https://rebate-app-core.onrender.com/api/rebates/total/${storedGoogleId}`
+        );
+        setRebatesUsed(res.data.total || 0);
+      } catch (err) {
+        console.error("Failed fetching rebate total", err);
+      }
+    };
+
+    fetchRebatesTotal();
+
   }, [initialUser, navigate]);
+
 
   const handleAvatarClick = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
@@ -223,7 +239,7 @@ export function HomePage() {
       >
         <Toolbar
           sx={{
-            maxWidth: 1200,
+            maxWidth: 950,
             width: "100%",
             mx: "auto",
             px: { xs: 2, md: 3 },
@@ -283,8 +299,8 @@ export function HomePage() {
           display: "flex",
           alignItems: "flex-start",
           justifyContent: "center",
-          px: { xs: 2, sm: 3, md: 6 },
-          py: { xs: 3, md: 6 },
+          px: { xs: 2, sm: 3, md: 4 },
+          py: { xs: 3, md: 4 },
         }}
       >
         <Grid
@@ -295,6 +311,7 @@ export function HomePage() {
             maxWidth: 1200,
             width: "100%",
             mx: "auto",
+            display: { xs: "block", md: "flex" },
           }}
         >
           {/* LEFT: greeting and food menu */}
@@ -350,85 +367,88 @@ export function HomePage() {
                   "&::-webkit-scrollbar": { height: 6 },
                 }}
               >
-                {foodCards.map((card) => (
-                  <Card
-                    key={card.key}
-                    sx={{
-                      minWidth: { xs: 160, sm: 180, md: 200 },
-                      maxWidth: { xs: 180, sm: 200, md: 240 },
-                      p: 2,
-                      borderRadius: 2,
-                      bgcolor: "rgba(10,14,23,0.75)",
-                      border: "1px solid rgba(41, 50, 70, 0.9)",
-                      flex: "0 0 auto",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      sx={{ color: "rgba(148,163,184,0.8)", mb: 0.7 }}
-                    >
-                      {card.label}
-                    </Typography>
-
-                    <Box
-                      component="img"
-                      src={DEFAULT_IMAGE}
-                      alt={`${card.label} image`}
+                {foodCards.map((card) => {
+                  const imageSrc = menuImages[today]?.[card.key] || DEFAULT_IMAGE;
+                  return (
+                    <Card
+                      key={card.key}
                       sx={{
-                        width: { xs: 72, sm: 84, md: 96 },
-                        height: { xs: 72, sm: 84, md: 96 },
-                        objectFit: "cover",
-                        borderRadius: 1,
-                        mb: 1,
-                        border: "1px solid rgba(55,65,81,0.6)",
-                      }}
-                    />
-
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: "#e5e7eb",
-                        fontWeight: 600,
-                        textAlign: "center",
+                        minWidth: { xs: 160, sm: 180, md: 180 },
+                        maxWidth: { xs: 180, sm: 180, md: 200 },
+                        p: 2,
+                        borderRadius: 2,
+                        bgcolor: "rgba(10,14,23,0.75)",
+                        border: "1px solid rgba(41, 50, 70, 0.9)",
+                        flex: "0 0 auto",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
                       }}
                     >
-                      {card.main}
-                    </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: "rgba(148,163,184,0.8)", mb: 0.7 }}
+                      >
+                        {card.label}
+                      </Typography>
 
-                    <Button
-                      size="small"
-                      sx={{
-                        mt: 1,
-                        textTransform: "none",
-                        color: "rgba(130,140,255,0.95)",
-                      }}
-                      onClick={() =>
-                        setOpenMeal(openMeal === card.key ? null : card.key)
-                      }
-                    >
-                      {openMeal === card.key ? "See less" : "See more"}
-                    </Button>
+                      <Box
+                        component="img"
+                        src={imageSrc}
+                        alt={`${card.label} image`}
+                        sx={{
+                          width: { xs: 72, sm: 84, md: 96 },
+                          height: { xs: 72, sm: 84, md: 96 },
+                          objectFit: "cover",
+                          borderRadius: 1,
+                          mb: 1,
+                          border: "1px solid rgba(55,65,81,0.6)",
+                        }}
+                      />
 
-                    <Collapse in={openMeal === card.key}>
-                      <List dense>
-                        {moreItems[card.key].map((item, idx) => (
-                          <ListItem key={idx} sx={{ py: 0 }}>
-                            <ListItemText
-                              primary={item}
-                              primaryTypographyProps={{
-                                sx: { color: "rgba(203,213,225,0.9)", fontSize: 13 },
-                              }}
-                            />
-                          </ListItem>
-                        ))}
-                      </List>
-                    </Collapse>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "#e5e7eb",
+                          fontWeight: 600,
+                          textAlign: "center",
+                        }}
+                      >
+                        {card.main}
+                      </Typography>
 
-                  </Card>
-                ))}
+                      <Button
+                        size="small"
+                        sx={{
+                          mt: 1,
+                          textTransform: "none",
+                          color: "rgba(130,140,255,0.95)",
+                        }}
+                        onClick={() =>
+                          setOpenMeal(openMeal === card.key ? null : card.key)
+                        }
+                      >
+                        {openMeal === card.key ? "See less" : "See more"}
+                      </Button>
+
+                      <Collapse in={openMeal === card.key}>
+                        <List dense>
+                          {moreItems[card.key].map((item, idx) => (
+                            <ListItem key={idx} sx={{ py: 0 }}>
+                              <ListItemText
+                                primary={item}
+                                primaryTypographyProps={{
+                                  sx: { color: "rgba(203,213,225,0.9)", fontSize: 13 },
+                                }}
+                              />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </Collapse>
+
+                    </Card>
+                  )
+                })}
               </Box>
 
               {/* --- Today's Extra Items (separate section) --- */}
@@ -557,6 +577,7 @@ export function HomePage() {
                 display: "flex",
                 justifyContent: { xs: "center", md: "flex-end" },
                 width: "100%",
+                alignSelf: { md: "flex-start" }
               }}
             >
               <Card
@@ -652,6 +673,7 @@ export function HomePage() {
                 display: "flex",
                 justifyContent: { xs: "center", md: "flex-end" },
                 width: "100%",
+                alignSelf: { md: "flex-start" }
               }}
             >
               <Card
@@ -669,6 +691,9 @@ export function HomePage() {
 
                   {/* Rebate history button */}
                   <Button
+                    onClick={() => {
+                      navigate('/my-rebates')
+                    }}
                     variant="contained"
                     sx={{
                       py: 1,
@@ -687,7 +712,7 @@ export function HomePage() {
                     variant="body2"
                     sx={{ color: "rgba(148,163,184,0.9)" }}
                   >
-                    Total rebates left: <strong>— TODO / 20</strong>
+                    Total rebates left: <strong>{20 - rebatesUsed} / 20</strong>
                   </Typography>
 
                   {/* Apply rebate */}
