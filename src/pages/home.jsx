@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import messMenu from "../assets/messMenu";
-import menuImages from "../assets/messMenu/index";
 import DEFAULT_IMAGE from "../assets/default.jpg";
 import {
   AppBar,
@@ -22,13 +21,12 @@ import {
   Collapse,
   List,
   ListItem,
-  ListItemText
+  ListItemText,
 } from "@mui/material";
 
 const BASE_URI = "http://localhost:3000";
 
 const todayName = new Date().toLocaleDateString("en-US", { weekday: "long" });
-const today = todayName.toLowerCase();
 const todayMenu = messMenu[todayName];
 
 export function HomePage() {
@@ -41,7 +39,6 @@ export function HomePage() {
   const [loading, setLoading] = useState(!initialUser);
   const [error, setError] = useState(null);
   const [openMeal, setOpenMeal] = useState(null);
-  const [rebatesUsed, setRebatesUsed] = useState(0);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const menuOpen = Boolean(anchorEl);
@@ -52,7 +49,7 @@ export function HomePage() {
     dinner: todayMenu.dinner.slice(1),
   };
 
-  // ------- fetch user from API -------
+  // fetch user if needed
   useEffect(() => {
     if (initialUser?.google_id) {
       localStorage.setItem("googleId", initialUser.google_id);
@@ -88,36 +85,21 @@ export function HomePage() {
     };
 
     fetchUser();
-
-    // FETCH TOTAL REBATES USED
-    const fetchRebatesTotal = async () => {
-      try {
-        const res = await axios.get(
-          `https://rebate-app-core.onrender.com/api/rebates/total/${storedGoogleId}`
-        );
-        setRebatesUsed(res.data.total || 0);
-      } catch (err) {
-        console.error("Failed fetching rebate total", err);
-      }
-    };
-
-    fetchRebatesTotal();
-
   }, [initialUser, navigate]);
-
 
   const handleAvatarClick = (event) => setAnchorEl(event.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
 
   const handleViewProfile = () => {
     handleMenuClose();
-    if (user) navigate("/profile", { state: { user } });
+    if (user) {
+      navigate("/profile", { state: { user } });
+    }
   };
 
   const handleApplyRebate = () => {
     handleMenuClose();
-
-    if (user)
+    if (user) {
       navigate("/rebate-application", {
         state: {
           name: user.name,
@@ -127,6 +109,7 @@ export function HomePage() {
           mess: user.mess,
         },
       });
+    }
   };
 
   const handleLogout = () => {
@@ -180,7 +163,6 @@ export function HomePage() {
   const status = user.status || "pending";
   const isVerified = status === "verified";
   const firstName = user?.name?.split(" ")[0] || "Student";
-
   const weekday = new Date().toLocaleDateString(undefined, { weekday: "long" });
 
   const foodCards = [
@@ -198,7 +180,7 @@ export function HomePage() {
       key: "dinner",
       label: "Dinner",
       main: todayMenu.dinner[0],
-    }
+    },
   ];
 
   const extraItems = {
@@ -232,7 +214,7 @@ export function HomePage() {
       >
         <Toolbar
           sx={{
-            maxWidth: 950,
+            maxWidth: 1200,
             width: "100%",
             mx: "auto",
             px: { xs: 2, md: 3 },
@@ -285,15 +267,15 @@ export function HomePage() {
         </Toolbar>
       </AppBar>
 
-      {/* MAIN CONTENT */}
+      {/* MAIN */}
       <Box
         sx={{
           flex: 1,
           display: "flex",
           alignItems: "flex-start",
           justifyContent: "center",
-          px: { xs: 2, sm: 3, md: 4 },
-          py: { xs: 3, md: 4 },
+          px: { xs: 2, sm: 3, md: 6 },
+          py: { xs: 3, md: 6 },
         }}
       >
         <Grid
@@ -304,10 +286,9 @@ export function HomePage() {
             maxWidth: 1200,
             width: "100%",
             mx: "auto",
-            display: { xs: "block", md: "flex" },
           }}
         >
-          {/* LEFT: greeting and food menu */}
+          {/* LEFT: greeting + menu */}
           <Grid item xs={12} md={6}>
             <Box sx={{ textAlign: { xs: "center", md: "left" } }}>
               <Typography
@@ -347,7 +328,7 @@ export function HomePage() {
                 Food menu for today:
               </Typography>
 
-              {/* food cards */}
+              {/* Food cards row */}
               <Box
                 sx={{
                   display: "flex",
@@ -359,88 +340,87 @@ export function HomePage() {
                   "&::-webkit-scrollbar": { height: 6 },
                 }}
               >
-                {foodCards.map((card) => {
-                  const imageSrc = menuImages[today]?.[card.key] || DEFAULT_IMAGE;
-                  return (
-                    <Card
-                      key={card.key}
+                {foodCards.map((card) => (
+                  <Card
+                    key={card.key}
+                    sx={{
+                      minWidth: { xs: 160, sm: 180, md: 200 },
+                      maxWidth: { xs: 180, sm: 200, md: 240 },
+                      p: 2,
+                      borderRadius: 2,
+                      bgcolor: "rgba(10,14,23,0.75)",
+                      border: "1px solid rgba(41, 50, 70, 0.9)",
+                      flex: "0 0 auto",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "rgba(148,163,184,0.8)", mb: 0.7 }}
+                    >
+                      {card.label}
+                    </Typography>
+
+                    <Box
+                      component="img"
+                      src={DEFAULT_IMAGE}
+                      alt={`${card.label} image`}
                       sx={{
-                        minWidth: { xs: 160, sm: 180, md: 180 },
-                        maxWidth: { xs: 180, sm: 180, md: 200 },
-                        p: 2,
-                        borderRadius: 2,
-                        bgcolor: "rgba(10,14,23,0.75)",
-                        border: "1px solid rgba(41, 50, 70, 0.9)",
-                        flex: "0 0 auto",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
+                        width: { xs: 72, sm: 84, md: 96 },
+                        height: { xs: 72, sm: 84, md: 96 },
+                        objectFit: "cover",
+                        borderRadius: 1,
+                        mb: 1,
+                        border: "1px solid rgba(55,65,81,0.6)",
+                      }}
+                    />
+
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "#e5e7eb",
+                        fontWeight: 600,
+                        textAlign: "center",
                       }}
                     >
-                      <Typography
-                        variant="caption"
-                        sx={{ color: "rgba(148,163,184,0.8)", mb: 0.7 }}
-                      >
-                        {card.label}
-                      </Typography>
+                      {card.main}
+                    </Typography>
 
-                      <Box
-                        component="img"
-                        src={imageSrc}
-                        alt={`${card.label} image`}
-                        sx={{
-                          width: { xs: 72, sm: 84, md: 96 },
-                          height: { xs: 72, sm: 84, md: 96 },
-                          objectFit: "cover",
-                          borderRadius: 1,
-                          mb: 1,
-                          border: "1px solid rgba(55,65,81,0.6)",
-                        }}
-                      />
+                    <Button
+                      size="small"
+                      sx={{
+                        mt: 1,
+                        textTransform: "none",
+                        color: "rgba(130,140,255,0.95)",
+                      }}
+                      onClick={() =>
+                        setOpenMeal(openMeal === card.key ? null : card.key)
+                      }
+                    >
+                      {openMeal === card.key ? "See less" : "See more"}
+                    </Button>
 
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: "#e5e7eb",
-                          fontWeight: 600,
-                          textAlign: "center",
-                        }}
-                      >
-                        {card.main}
-                      </Typography>
-
-                      <Button
-                        size="small"
-                        sx={{
-                          mt: 1,
-                          textTransform: "none",
-                          color: "rgba(130,140,255,0.95)",
-                        }}
-                        onClick={() =>
-                          setOpenMeal(openMeal === card.key ? null : card.key)
-                        }
-                      >
-                        {openMeal === card.key ? "See less" : "See more"}
-                      </Button>
-
-                      <Collapse in={openMeal === card.key}>
-                        <List dense>
-                          {moreItems[card.key].map((item, idx) => (
-                            <ListItem key={idx} sx={{ py: 0 }}>
-                              <ListItemText
-                                primary={item}
-                                primaryTypographyProps={{
-                                  sx: { color: "rgba(203,213,225,0.9)", fontSize: 13 },
-                                }}
-                              />
-                            </ListItem>
-                          ))}
-                        </List>
-                      </Collapse>
-
-                    </Card>
-                  )
-                })}
+                    <Collapse in={openMeal === card.key}>
+                      <List dense>
+                        {moreItems[card.key].map((item, idx) => (
+                          <ListItem key={idx} sx={{ py: 0 }}>
+                            <ListItemText
+                              primary={item}
+                              primaryTypographyProps={{
+                                sx: {
+                                  color: "rgba(203,213,225,0.9)",
+                                  fontSize: 13,
+                                },
+                              }}
+                            />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </Collapse>
+                  </Card>
+                ))}
               </Box>
 
               {/* Extra items */}
@@ -487,10 +467,16 @@ export function HomePage() {
                       }}
                     />
                     <Box sx={{ flex: 1 }}>
-                      <Typography variant="body2" sx={{ color: "#e5e7eb", fontWeight: 600 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "#e5e7eb", fontWeight: 600 }}
+                      >
                         Lunch — {extraItems.lunch.title}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: "rgba(148,163,184,0.9)" }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: "rgba(148,163,184,0.9)" }}
+                      >
                         {extraItems.lunch.desc}
                       </Typography>
                     </Box>
@@ -533,10 +519,16 @@ export function HomePage() {
                       }}
                     />
                     <Box sx={{ flex: 1 }}>
-                      <Typography variant="body2" sx={{ color: "#e5e7eb", fontWeight: 600 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "#e5e7eb", fontWeight: 600 }}
+                      >
                         Dinner — {extraItems.dinner.title}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: "rgba(148,163,184,0.9)" }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: "rgba(148,163,184,0.9)" }}
+                      >
                         {extraItems.dinner.desc}
                       </Typography>
                     </Box>
@@ -572,14 +564,17 @@ export function HomePage() {
           >
             <Card
               sx={{
-                display: "flex",
-                justifyContent: { xs: "center", md: "flex-end" },
-                width: "100%",
-                alignSelf: { md: "flex-start" }
+                width: { xs: "100%", sm: "92%", md: "100%" },
+                maxWidth: { xs: "100%", sm: 480, md: 420 },
+                p: { xs: 2.5, sm: 3.5 },
+                borderRadius: 3,
+                bgcolor: "rgba(15, 23, 42, 0.98)",
+                border: "1px solid rgba(51, 65, 85, 1)",
+                boxShadow: "0 20px 50px rgba(15,23,42,0.9)",
               }}
             >
               <Stack spacing={2.5}>
-                {/* Top: chip + avatar + basic info */}
+                {/* top: chip + avatar + info */}
                 <Stack
                   direction="row"
                   spacing={2}
@@ -592,7 +587,9 @@ export function HomePage() {
                         label={isVerified ? "Profile Verified" : "Pending Verification"}
                         size="small"
                         sx={{
-                          bgcolor: isVerified ? "rgba(22, 163, 74, 0.15)" : "rgba(234, 179, 8, 0.12)",
+                          bgcolor: isVerified
+                            ? "rgba(22, 163, 74, 0.15)"
+                            : "rgba(234, 179, 8, 0.12)",
                           color: isVerified ? "#4ade80" : "#facc15",
                           borderRadius: "999px",
                           border: "1px solid rgba(148,163,184,0.25)",
@@ -600,58 +597,36 @@ export function HomePage() {
                         }}
                       />
                       {user?.entry_no && (
-                        <Typography variant="caption" sx={{ color: "rgba(148, 163, 184, 0.9)" }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ color: "rgba(148, 163, 184, 0.9)" }}
+                        >
                           {user.entry_no}
                         </Typography>
                       )}
                     </Stack>
 
-                    <Typography variant="body2" sx={{ color: "rgba(148,163,184,0.9)" }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "rgba(148,163,184,0.9)" }}
+                    >
                       {user.email}
                     </Typography>
 
                     {user?.hostel && (
-                      <Typography variant="caption" sx={{ color: "rgba(148,163,184,0.9)" }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: "rgba(148,163,184,0.9)" }}
+                      >
                         {user.hostel} hostel • {user.mess} mess ·{" "}
                         {user.food_choice === "veg" ? "Veg" : "Non-veg"}
                       </Typography>
                     )}
                   </Stack>
-                </Stack>
-              </Card>
-            </Grid>
-          )}
-          {isVerified && (
-            <Grid
-              item
-              xs={12}
-              md={6}
-              sx={{
-                display: "flex",
-                justifyContent: { xs: "center", md: "flex-end" },
-                width: "100%",
-                alignSelf: { md: "flex-start" }
-              }}
-            >
-              <Card
-                sx={{
-                  width: { xs: "100%", sm: "92%", md: "100%" },
-                  maxWidth: { xs: "100%", sm: 480, md: 420 },
-                  p: { xs: 2.5, sm: 3.5 },
-                  borderRadius: 3,
-                  bgcolor: "rgba(15, 23, 42, 0.98)",
-                  border: "1px solid rgba(51, 65, 85, 1)",
-                  boxShadow: "0 20px 50px rgba(15,23,42,0.9)",
-                }}
-              >
-                <Stack spacing={2}>
 
-                  {/* Rebate history button */}
-                  <Button
-                    onClick={() => {
-                      navigate('/my-rebates')
-                    }}
-                    variant="contained"
+                  <Avatar
+                    src={user?.avatar_url || undefined}
+                    alt={user?.name}
                     sx={{
                       width: 56,
                       height: 56,
@@ -664,7 +639,7 @@ export function HomePage() {
                   </Avatar>
                 </Stack>
 
-                {/* Middle: status text */}
+                {/* middle: status text */}
                 <Stack spacing={0.8}>
                   <Typography
                     variant="subtitle1"
@@ -676,11 +651,22 @@ export function HomePage() {
                     variant="body2"
                     sx={{ color: "rgba(148, 163, 184, 0.95)" }}
                   >
-                    Total rebates left: <strong>{20 - rebatesUsed} / 20</strong>
+                    {isVerified ? (
+                      <>
+                        Your profile has been <strong>verified</strong>. You now get
+                        full access to all rebate features.
+                      </>
+                    ) : (
+                      <>
+                        Once an admin verifies your profile, rebate features will be
+                        unlocked automatically. You’ll see your full rebate summary
+                        here.
+                      </>
+                    )}
                   </Typography>
                 </Stack>
 
-                {/* Bottom: actions depending on verification */}
+                {/* bottom: actions */}
                 {isVerified ? (
                   <Stack spacing={1.5} mt={1}>
                     <Typography
@@ -697,13 +683,13 @@ export function HomePage() {
                       Total rebates left: <strong>— TODO / 20</strong>
                     </Typography>
 
-                    <Stack direction={{ xs: "column", sm: "row" }} spacing={1.2}>
+                    <Stack
+                      direction={{ xs: "column", sm: "row" }}
+                      spacing={1.2}
+                    >
                       <Button
                         variant="contained"
                         fullWidth
-                        onClick={() => {
-                          navigate()
-                        }}
                         sx={{
                           py: 1,
                           borderRadius: 999,
@@ -712,6 +698,7 @@ export function HomePage() {
                           fontWeight: 600,
                           textTransform: "none",
                         }}
+                        onClick={() => navigate("/my-rebates")}
                       >
                         View rebate history
                       </Button>
