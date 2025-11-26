@@ -26,13 +26,8 @@ import {
 
 const BASE_URI = "http://localhost:3000";
 
-// --- placeholder image (uploaded file path from your session) ---
-// Developer note: I used the uploaded file path you provided. You'll transform it to a URL when serving.
-const IMAGE_PLACEHOLDER = "/mnt/data/8f8f52b6-70af-4ed0-8b9e-9fe56bb3e2e3.png";
-
 const todayName = new Date().toLocaleDateString("en-US", { weekday: "long" });
 const todayMenu = messMenu[todayName];
-
 
 export function HomePage() {
   const { state } = useLocation();
@@ -45,7 +40,6 @@ export function HomePage() {
   const [error, setError] = useState(null);
   const [openMeal, setOpenMeal] = useState(null);
 
-
   const [anchorEl, setAnchorEl] = useState(null);
   const menuOpen = Boolean(anchorEl);
 
@@ -54,7 +48,6 @@ export function HomePage() {
     lunch: todayMenu.lunch.slice(1),
     dinner: todayMenu.dinner.slice(1),
   };
-
 
   // ------- fetch user from API -------
   useEffect(() => {
@@ -169,14 +162,13 @@ export function HomePage() {
   const isVerified = status === "verified";
   const firstName = user?.name?.split(" ")[0] || "Student";
 
-  // greeting includes today's weekday
   const weekday = new Date().toLocaleDateString(undefined, { weekday: "long" });
 
   const foodCards = [
     {
       key: "breakfast",
       label: "Breakfast",
-      main: todayMenu.breakfast[0],  // first item
+      main: todayMenu.breakfast[0],
     },
     {
       key: "lunch",
@@ -190,8 +182,6 @@ export function HomePage() {
     }
   ];
 
-
-  // today's extra items (hardcoded as requested)
   const extraItems = {
     lunch: { title: "Curd", desc: "Fresh curd (200 ml)" },
     dinner: { title: "Chicken Biryani", desc: "Spicy biryani (single plate)" },
@@ -211,7 +201,7 @@ export function HomePage() {
         overflowX: "hidden",
       }}
     >
-      {/* NAVBAR full width */}
+      {/* NAVBAR */}
       <AppBar
         position="static"
         elevation={0}
@@ -337,7 +327,7 @@ export function HomePage() {
                 Food menu for today:
               </Typography>
 
-              {/* --- HORIZONTAL FOOD CARDS (always horizontal) --- */}
+              {/* food cards */}
               <Box
                 sx={{
                   display: "flex",
@@ -346,7 +336,6 @@ export function HomePage() {
                   overflowX: { xs: "auto", md: "visible" },
                   py: { xs: 1, md: 0 },
                   px: { xs: 1, md: 0 },
-                  // hide horizontal scrollbar but keep scroll functionality on mobile
                   "&::-webkit-scrollbar": { height: 6 },
                 }}
               >
@@ -426,12 +415,11 @@ export function HomePage() {
                         ))}
                       </List>
                     </Collapse>
-
                   </Card>
                 ))}
               </Box>
 
-              {/* --- Today's Extra Items (separate section) --- */}
+              {/* Extra items */}
               <Box
                 sx={{
                   mt: 3,
@@ -451,7 +439,7 @@ export function HomePage() {
                 </Typography>
 
                 <Stack spacing={1.4}>
-                  {/* Lunch extra (hardcoded Curd) */}
+                  {/* Lunch extra */}
                   <Stack
                     direction="row"
                     spacing={2}
@@ -497,7 +485,7 @@ export function HomePage() {
                     </Button>
                   </Stack>
 
-                  {/* Dinner extra (hardcoded Chicken Biryani) */}
+                  {/* Dinner extra */}
                   <Stack
                     direction="row"
                     spacing={2}
@@ -547,37 +535,37 @@ export function HomePage() {
             </Box>
           </Grid>
 
-          {/* RIGHT: compact status / actions card */}
-          {!isVerified && (
-            <Grid
-              item
-              xs={12}
-              md={6}
+          {/* RIGHT: unified status + rebate card */}
+          <Grid
+            item
+            xs={12}
+            md={6}
+            sx={{
+              display: "flex",
+              justifyContent: { xs: "center", md: "flex-end" },
+              width: "100%",
+            }}
+          >
+            <Card
               sx={{
-                display: "flex",
-                justifyContent: { xs: "center", md: "flex-end" },
-                width: "100%",
+                width: { xs: "100%", sm: "92%", md: "100%" },
+                maxWidth: { xs: "100%", sm: 480, md: 420 },
+                p: { xs: 2.5, sm: 3.5 },
+                borderRadius: 3,
+                bgcolor: "rgba(15, 23, 42, 0.98)",
+                border: "1px solid rgba(51, 65, 85, 1)",
+                boxShadow: "0 20px 50px rgba(15,23,42,0.9)",
               }}
             >
-              <Card
-                sx={{
-                  width: { xs: "100%", sm: "92%", md: "100%" },
-                  maxWidth: { xs: "100%", sm: 480, md: 420 },
-                  p: { xs: 2.5, sm: 3.5 },
-                  borderRadius: 3,
-                  bgcolor: "rgba(15, 23, 42, 0.98)",
-                  border: "1px solid rgba(51, 65, 85, 1)",
-                  boxShadow: "0 20px 50px rgba(15,23,42,0.9)",
-                  mx: "auto",
-                }}
-              >
-                <Stack spacing={2}>
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
+              <Stack spacing={2.5}>
+                {/* Top: chip + avatar + basic info */}
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Stack spacing={0.6}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <Chip
                         label={isVerified ? "Profile Verified" : "Pending Verification"}
@@ -597,117 +585,149 @@ export function HomePage() {
                       )}
                     </Stack>
 
-                    <Avatar
-                      src={user?.avatar_url || undefined}
-                      alt={user?.name}
-                      sx={{
-                        width: 56,
-                        height: 56,
-                        bgcolor: "#4f46e5",
-                        fontSize: 24,
-                        fontWeight: 700,
-                      }}
-                    >
-                      {!user?.avatar_url && (user?.name?.[0]?.toUpperCase() || "U")}
-                    </Avatar>
-                  </Stack>
-
-                  <Typography variant="subtitle1" sx={{ color: "#e5e7eb", fontWeight: 600 }}>
-                    {isVerified ? "You're all set!" : "Your profile is under review"}
-                  </Typography>
-
-                  <Typography variant="body2" sx={{ color: "rgba(148, 163, 184, 0.95)" }}>
-                    {isVerified ? (
-                      <>
-                        Your profile has been <strong>verified</strong>. You now receive full access.
-                      </>
-                    ) : (
-                      <>
-                        You can use <strong>rebate features</strong> only after Verification. Please wait for admin approval.
-                      </>
-                    )}
-                  </Typography>
-
-                  <Stack spacing={1}>
-                    <Typography variant="caption" sx={{ color: "rgba(148, 163, 184, 0.9)" }}>
-                      {user?.email}
+                    <Typography variant="body2" sx={{ color: "rgba(148,163,184,0.9)" }}>
+                      {user.email}
                     </Typography>
 
                     {user?.hostel && (
-                      <Typography variant="caption" sx={{ color: "rgba(148, 163, 184, 0.9)" }}>
-                        {user.hostel} hostel • {user.mess} mess · {user.food_choice === "veg" ? "Veg" : "Non-veg"}
+                      <Typography variant="caption" sx={{ color: "rgba(148,163,184,0.9)" }}>
+                        {user.hostel} hostel • {user.mess} mess ·{" "}
+                        {user.food_choice === "veg" ? "Veg" : "Non-veg"}
                       </Typography>
                     )}
                   </Stack>
-                </Stack>
-              </Card>
-            </Grid>
-          )}
-          {isVerified && (
-            <Grid
-              item
-              xs={12}
-              md={6}
-              sx={{
-                display: "flex",
-                justifyContent: { xs: "center", md: "flex-end" },
-                width: "100%",
-              }}
-            >
-              <Card
-                sx={{
-                  width: { xs: "100%", sm: "92%", md: "100%" },
-                  maxWidth: { xs: "100%", sm: 480, md: 420 },
-                  p: { xs: 2.5, sm: 3.5 },
-                  borderRadius: 3,
-                  bgcolor: "rgba(15, 23, 42, 0.98)",
-                  border: "1px solid rgba(51, 65, 85, 1)",
-                  boxShadow: "0 20px 50px rgba(15,23,42,0.9)",
-                }}
-              >
-                <Stack spacing={2}>
 
-                  {/* Rebate history button */}
-                  <Button
-                    variant="contained"
+                  <Avatar
+                    src={user?.avatar_url || undefined}
+                    alt={user?.name}
                     sx={{
-                      py: 1,
-                      borderRadius: 999,
-                      backgroundImage:
-                        "linear-gradient(135deg, #4f46e5 0%, #22c55e 50%, #0ea5e9 100%)",
-                      fontWeight: 600,
-                      textTransform: "none",
+                      width: 56,
+                      height: 56,
+                      bgcolor: "#4f46e5",
+                      fontSize: 24,
+                      fontWeight: 700,
                     }}
                   >
-                    Click to see your rebate history
-                  </Button>
+                    {!user?.avatar_url && (user?.name?.[0]?.toUpperCase() || "U")}
+                  </Avatar>
+                </Stack>
 
-                  {/* Rebates left */}
+                {/* Middle: status text */}
+                <Stack spacing={0.8}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ color: "#e5e7eb", fontWeight: 600 }}
+                  >
+                    {isVerified ? "You're all set!" : "Your profile is under review"}
+                  </Typography>
                   <Typography
                     variant="body2"
-                    sx={{ color: "rgba(148,163,184,0.9)" }}
+                    sx={{ color: "rgba(148, 163, 184, 0.95)" }}
                   >
-                    Total rebates left: <strong>— TODO / 20</strong>
+                    {isVerified ? (
+                      <>
+                        Your profile has been <strong>verified</strong>. You now get
+                        full access to all rebate features.
+                      </>
+                    ) : (
+                      <>
+                        Once an admin verifies your profile, rebate features will be
+                        unlocked automatically. You’ll see your full rebate summary here.
+                      </>
+                    )}
                   </Typography>
-
-                  {/* Apply rebate */}
-                  <Button
-                    variant="outlined"
-                    onClick={handleApplyRebate}
-                    sx={{
-                      textTransform: "none",
-                      borderRadius: 999,
-                      borderColor: "rgba(75, 85, 99, 1)",
-                      color: "#e5e7eb",
-                    }}
-                  >
-                    Apply for rebate
-                  </Button>
-
                 </Stack>
-              </Card>
-            </Grid>
-          )}
+
+                {/* Bottom: actions depending on verification */}
+                {isVerified ? (
+                  <Stack spacing={1.5} mt={1}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ color: "#e5e7eb", fontWeight: 600 }}
+                    >
+                      Rebate overview
+                    </Typography>
+
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "rgba(148,163,184,0.9)" }}
+                    >
+                      Total rebates left: <strong>— TODO / 20</strong>
+                    </Typography>
+
+                    <Stack direction={{ xs: "column", sm: "row" }} spacing={1.2}>
+                      <Button
+                        variant="contained"
+                        fullWidth
+                        onClick={() => {
+                          navigate()
+                        }}
+                        sx={{
+                          py: 1,
+                          borderRadius: 999,
+                          backgroundImage:
+                            "linear-gradient(135deg, #4f46e5 0%, #22c55e 50%, #0ea5e9 100%)",
+                          fontWeight: 600,
+                          textTransform: "none",
+                        }}
+                      >
+                        View rebate history
+                      </Button>
+
+                      <Button
+                        variant="outlined"
+                        fullWidth
+                        onClick={handleApplyRebate}
+                        sx={{
+                          textTransform: "none",
+                          borderRadius: 999,
+                          borderColor: "rgba(75, 85, 99, 1)",
+                          color: "#e5e7eb",
+                          "&:hover": {
+                            borderColor: "#6366f1",
+                            backgroundColor: "rgba(55,65,81,0.6)",
+                          },
+                        }}
+                      >
+                        Apply for rebate
+                      </Button>
+                    </Stack>
+                  </Stack>
+                ) : (
+                  <Stack spacing={1.5} mt={1}>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ color: "#e5e7eb", fontWeight: 600 }}
+                    >
+                      Finish verification to use rebates
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "rgba(148,163,184,0.9)" }}
+                    >
+                      You can review your details from the profile page. If any
+                      information is incorrect, edit it there while your profile is
+                      still in pending state.
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      onClick={handleViewProfile}
+                      sx={{
+                        mt: 0.5,
+                        textTransform: "none",
+                        borderRadius: 999,
+                        borderColor: "rgba(75, 85, 99, 1)",
+                        color: "#e5e7eb",
+                        alignSelf: "flex-start",
+                      }}
+                    >
+                      Go to profile
+                    </Button>
+                  </Stack>
+                )}
+              </Stack>
+            </Card>
+          </Grid>
         </Grid>
       </Box>
     </Box>
